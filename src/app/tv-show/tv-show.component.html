@@ -1,0 +1,107 @@
+<div class="container mt-5">
+    <h2>Programas de Televisión</h2>
+
+    <button class="btn btn-primary mb-4" (click)="openModal()">Agregar Programa</button>
+
+    <div class="mb-3">
+        <label for="resultsPerPage" class="form-label me-2">Resultados por página:</label>
+        <select id="resultsPerPage" [(ngModel)]="resultsPerPage" (change)="onResultsPerPageChange()">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="search" class="form-label">Buscar:</label>
+        <input type="text" id="search" [(ngModel)]="searchTerm" (input)="onSearchChange()" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Favoritos:</label>
+        <div>
+            <button (click)="onFavoriteFilterChange(true)" class="btn btn-primary">Solo Favoritos</button>
+            <button (click)="onFavoriteFilterChange(false)" class="btn btn-secondary mx-2">No Favoritos</button>
+            <button (click)="onFavoriteFilterChange(null)" class="btn btn-light">Todos</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Favorito</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="!hasResults">
+                <td colspan="4" class="text-center">No se encontraron programas de televisión.</td>
+            </tr>
+            <tr *ngFor="let tvShow of tvShows">
+                <td>{{ tvShow.id }}</td>
+                <td>{{ tvShow.name }}</td>
+                <td>{{ tvShow.favorite ? 'Sí' : 'No' }}</td>
+                <td>
+                    <button class="btn btn-warning me-2" (click)="edit(tvShow)">Editar</button>
+                    <button class="btn btn-danger" (click)="confirmDelete(tvShow.id!)">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <!-- Paginación -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="changePage(currentPage - 1)">Anterior</button>
+            </li>
+            <li class="page-item" [class.disabled]="!hasResults">
+                <button class="page-link" (click)="changePage(currentPage + 1)" [attr.aria-disabled]="!hasResults ? 'true' : null">Siguiente</button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Modal para agregar y editar programas -->
+    <div class="modal fade" id="tvShowModal" tabindex="-1" aria-labelledby="tvShowModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tvShowModalLabel">{{ editTvShow ? 'Editar Programa' : 'Agregar Programa'
+                        }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        (click)="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="tvShowName" class="form-label">Nombre</label>
+                        <input type="text" id="tvShowName" [(ngModel)]="newTvShow.name" class="form-control">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="favorite" [(ngModel)]="newTvShow.favorite" class="form-check-input">
+                        <label for="favorite" class="form-check-label">Favorito</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        (click)="closeModal()">Cerrar</button>
+                    <button type="button" class="btn btn-primary" (click)="editTvShow ? updateTvShow() : addTvShow()">{{
+                        editTvShow ? 'Actualizar' : 'Agregar' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast para mostrar mensajes -->
+    <div *ngIf="toastMessage" class="toast align-items-center text-bg-{{ toastType }} border-0 show" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ toastMessage }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="closeToast()"></button>
+        </div>
+    </div>
+</div>
